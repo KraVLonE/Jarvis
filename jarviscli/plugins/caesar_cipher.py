@@ -1,7 +1,5 @@
 from colorama import Fore
-
 from plugin import plugin
-
 
 @plugin("caesar cipher")
 def caesar_cipher_converter(jarvis, s):
@@ -10,9 +8,7 @@ def caesar_cipher_converter(jarvis, s):
         plain_to_cipher(jarvis)
     elif option == 2:
         cipher_to_plain(jarvis)
-    else:
-        return
-
+    # No need for else; get_option handles invalid choices.
 
 def get_option(jarvis):
     jarvis.say("~> What can I do for you?", Fore.RED)
@@ -26,66 +22,33 @@ def get_option(jarvis):
             option = int(jarvis.input("Enter your choice: ", Fore.GREEN))
             if option == 3:
                 return
-            elif option == 1 or option == 2:
+            elif option in [1, 2]:
                 return option
             else:
-                jarvis.say(
-                    "Invalid input! Enter a number from the choices provided.", Fore.YELLOW)
+                jarvis.say("Invalid input! Enter a number from the choices provided.", Fore.YELLOW)
         except ValueError:
-            jarvis.say(
-                "Invalid input! Enter a number from the choices provided.", Fore.YELLOW)
+            jarvis.say("Invalid input! Enter a number from the choices provided.", Fore.YELLOW)
         print()
 
+def caesar_cipher(text, shift):
+    converted = ""
+    for i in text:
+        if i.isalpha():
+            start = ord('A') if i.isupper() else ord('a')
+            converted += chr((ord(i) - start + shift) % 26 + start)
+        else:
+            converted += i
+    return converted
 
 def plain_to_cipher(jarvis):
     user_input = get_user_input(jarvis)
-    converted = ""
-
-    for i in user_input:
-        if is_ascii(i):
-            if i.isalpha():
-                if i.isupper():
-                    converted += chr((ord(i) - 68) % 26 + 65)
-                else:
-                    converted += chr((ord(i) - 100) % 26 + 97)
-            else:
-                converted += i
-        else:
-            x = ord(i)
-            if 192 <= x <= 255:
-                converted += chr((ord(i) - 195) % 63 + 192)
-            else:
-                converted += i
-
+    converted = caesar_cipher(user_input, 3)
     jarvis.say(converted, Fore.YELLOW)
-
-
-def is_ascii(s):
-    return all(ord(c) < 128 for c in s)
-
 
 def cipher_to_plain(jarvis):
     user_input = get_user_input(jarvis)
-    converted = ""
-
-    for i in user_input:
-        if is_ascii(i):
-            if i.isalpha():
-                if i.isupper():
-                    converted += chr((ord(i) - 62) % 26 + 65)
-                else:
-                    converted += chr((ord(i) - 94) % 26 + 97)
-            else:
-                converted += i
-        else:
-            x = ord(i)
-            if 192 <= x <= 255:
-                converted += chr((ord(i) - 189) % 63 + 192)
-            else:
-                converted += i
-
+    converted = caesar_cipher(user_input, -3)
     jarvis.say(converted, Fore.YELLOW)
-
 
 def get_user_input(jarvis):
     while True:
@@ -94,10 +57,6 @@ def get_user_input(jarvis):
             if len(user_input) > 0:
                 return user_input
             else:
-                jarvis.say(
-                    "String length should be minimum 1.", Fore.YELLOW)
+                jarvis.say("String length should be minimum 1.", Fore.YELLOW)
         except ValueError:
             jarvis.say("Sorry, I didn't understand that.", Fore.RED)
-            continue
-
-    return
